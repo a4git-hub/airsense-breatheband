@@ -1,0 +1,87 @@
+﻿ESP32-C3 Development Board (Mini or SuperMini)
+* Single-core RISC-V with WiFi and Bluetooth 5.0 (BLE)​
+
+
+* Lower power consumption (~60mA active, 5µA deep sleep) ideal for wearables​
+
+
+* USB-C port for programming and charging integration​
+
+
+* Compact size perfect for wrist-worn devices​
+
+
+* Works with Arduino IDE and all I²C sensors (BME680, PMSA003I)​
+
+
+* Amazon price: ~$8–$15 (often sold in 2-3 packs)
+PMSA003I Laser Dust Sensor (I²C PM2.5 Sensor)
+* Ultra-small and perfect for wearables
+
+* Uses I²C (easy wiring)
+
+* Much better than DHT11 + your kit sensors
+
+* Amazon price: ~$18–$24
+
+Bosch BME680 Environmental Sensor
+   * Measures temperature, humidity, pressure, and VOCs
+
+   * Works with Arduino (libraries available)
+
+   * Very useful for air-quality scoring
+
+   * Amazon price: ~$18–$26
+
+Vibration Motor (Coin Type, 3V)
+      * For haptic breathing feedback
+
+      * Coin style (flat)
+
+      * Recommended: 10mm x 3mm 3V
+
+      * Amazon price: ~$6–$10 (pack of 2–5)
+
+12-LED NeoPixel Ring (WS2812)
+         * For visual breathing pattern animation
+
+         * Very bright, low power
+
+         * Amazon price: ~$6–$10
+
+3.7V 500–800 mAh Li-Po Battery (with JST plug)
+            * Rechargeable
+
+            * Powers band + sensors
+
+            * Size is slim for wearables
+
+            * Amazon price: ~$7–$12
+
+TP4056 Li-Po Charging Module (with USB-C preferred)
+               * Safely charges the Li-Po battery
+
+               * Will allow USB charging like a smartwatch
+
+               * Amazon price: ~$6–$8 (pack of 2)
+
+Mini Slide or Push Power Switch
+                  * For turning device on/off
+
+                  * Very small form factor
+
+                  * Amazon price: ~$5–$8 (multi-pack)
+
+Soft Elastic Wrist Strap + Enclosure Box
+                     * Elastic band for wearing the device
+
+                     * Small plastic enclosure for sensor + board
+
+                     * Amazon price: ~$8–$15
+
+Soldering Starter Set (optional but good for later projects)
+                        * Soldering iron + solder wire
+
+                        * Optional but helpful
+
+                        * Amazon price: ~$12–$20

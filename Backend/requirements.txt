@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+requests
+sqlalchemy
+passlib[bcrypt]
+bcrypt==3.2.2
+bleak

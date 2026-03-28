@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AirSense - Air Quality Monitor</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+
+        <!-- Login Tab -->
+        <div id="login-tab" class="tab-content">
+            <div class="login-container">
+                <div class="login-form">
+                    <h1 class="login-title">🌬️ AirSense</h1>
+                    <p class="login-subtitle">Your Personal Air Quality Monitor</p>
+
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="login-email" placeholder="you@email.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-control" id="login-password" placeholder="••••••••">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="login-name" placeholder="John Doe">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Age</label>
+                        <input type="number" class="form-control" id="user-age" min="1" max="120">
+                    </div>
+
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-primary" style="flex:1;" onclick="handleLogin()">Log In</button>
+                        <button class="btn btn-primary"
+                            style="flex:1; background-color: #10B981; border-color: #10B981;"
+                            onclick="handleRegister()">Sign Up</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Home Tab -->
+        <div id="home-tab" class="tab-content">
+            <div class="header">
+                <div class="header-top">
+                    <div class="logo">🌬️ AirSense</div>
+                    <div class="user-avatar" id="user-avatar">AJ</div>
+                </div>
+                <div class="location-display">
+                    <span>📍</span>
+                    <span id="current-location">Location</span>
+                    <button class="change-location" onclick="switchTab('settings')">Change</button>
+                </div>
+            </div>
+
+            <div id="wildfire-alert"></div>
+
+            <!-- Two-column comparison grid -->
+            <div class="comparison-grid">
+
+                <!-- Block A: Cloud / Open Weather -->
+                <div class="comparison-block cloud-block">
+                    <div class="comparison-block-header">
+                        <span class="comparison-icon">☁️</span>
+                        <div>
+                            <div class="comparison-title">Open Weather API</div>
+                            <div class="comparison-subtitle">Location-based outdoor AQI</div>
+                        </div>
+                    </div>
+
+                    <div class="aqi-hero-compact" id="aqi-hero">
+                        <div class="aqi-number" id="aqi-number">--</div>
+                        <div class="aqi-label" id="aqi-label">AQI</div>
+                    </div>
+
+                    <div class="comparison-metric-grid">
+                        <div class="comparison-metric">
+                            <div class="metric-label">🖫 PM2.5</div>
+                            <div class="metric-value" id="cloud-pm25">--</div>
+                        </div>
+                        <div class="comparison-metric">
+                            <div class="metric-label">🏃 Exercise</div>
+                            <div class="metric-value" id="exercise-safe">--</div>
+                        </div>
+                        <div class="comparison-metric">
+                            <div class="metric-label">😷 Mask</div>
+                            <div class="metric-value" id="mask-recommendation">--</div>
+                        </div>
+                        <div class="comparison-metric">
+                            <div class="metric-label">🟢 Category</div>
+                            <div class="metric-value" id="health-advisory">--</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">Air Quality Details</div>
+                        <div class="pollutants-grid" id="pollutants-grid"></div>
+                    </div>
+                </div>
+
+                <!-- Block B: Local Band / ESP32 -->
+                <div class="comparison-block local-block">
+                    <div class="comparison-block-header">
+                        <span class="comparison-icon">⌚</span>
+                        <div>
+                            <div class="comparison-title">BreatheBand (Local)</div>
+                            <div class="comparison-subtitle">Live ESP32 sensor feed</div>
+                        </div>
+                        <span class="band-status-badge" id="band-status-badge">Connecting…</span>
+                    </div>
+
+                    <div class="aqi-hero-compact local-aqi-hero" id="local-aqi-hero">
+                        <div class="aqi-number" id="local-pm25-display">--</div>
+                        <div class="aqi-label">PM2.5 (µg/m³)</div>
+                    </div>
+
+                    <div class="comparison-metric-grid">
+                        <div class="comparison-metric">
+                            <div class="metric-label">🌡️ Temp</div>
+                            <div class="metric-value" id="local-temp">--</div>
+                        </div>
+                        <div class="comparison-metric">
+                            <div class="metric-label">💧 Humidity</div>
+                            <div class="metric-value" id="local-humidity">--</div>
+                        </div>
+                        <div class="comparison-metric">
+                            <div class="metric-label">🔵 Pressure</div>
+                            <div class="metric-value" id="local-pressure">--</div>
+                        </div>
+                        <div class="comparison-metric">
+                            <div class="metric-label">🧪 Gas</div>
+                            <div class="metric-value" id="local-gas">--</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">Particulate Matter</div>
+                        <div class="comparison-metric-grid">
+                            <div class="comparison-metric">
+                                <div class="metric-label">PM1.0</div>
+                                <div class="metric-value" id="local-pm1">--</div>
+                            </div>
+                            <div class="comparison-metric">
+                                <div class="metric-label">PM2.5</div>
+                                <div class="metric-value" id="local-pm25">--</div>
+                            </div>
+                            <div class="comparison-metric">
+                                <div class="metric-label">PM10</div>
+                                <div class="metric-value" id="local-pm10">--</div>
+                            </div>
+                            <div class="comparison-metric">
+                                <div class="metric-label">⛰️ Altitude</div>
+                                <div class="metric-value" id="local-altitude">--</div>
+                            </div>
+                        </div>
+                        <div style="font-size:0.75em; opacity:0.5; margin-top: 8px;" id="local-last-sync">Last sync:
+                            never</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Map Tab -->
+        <div id="map-tab" class="tab-content">
+            <h2 class="text-center mb-24">Regional Air Quality Map</h2>
+
+            <div class="card mb-24">
+                <div class="card-title">Nearby Areas with Better Air Quality</div>
+                <div class="map-grid" id="nearby-areas"></div>
+            </div>
+
+            <div class="map-legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: var(--aqi-good);"></div><span>Good (0-50)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: var(--aqi-moderate);"></div><span>Moderate
+                        (51-100)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: var(--aqi-unhealthy-sensitive);"></div><span>Unhealthy
+                        for Sensitive (101-150)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: var(--aqi-unhealthy);"></div><span>Unhealthy
+                        (151-200)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: var(--aqi-very-unhealthy);"></div><span>Very Unhealthy
+                        (201+)</span>
+                </div>
+            </div>
+            <!-- The old static grid area gets hidden to prioritize the nearby block -->
+            <div class="map-container" style="display:none;">
+                <div class="map-grid" id="map-grid"></div>
+            </div>
+        </div>
+
+        <!-- Weekly Tab -->
+        <div id="weekly-tab" class="tab-content">
+            <h2 class="text-center mb-24">7-Day Air Quality Forecast</h2>
+            <div class="card mb-24">
+                <div class="alert alert-info"><span class="alert-icon">💡</span>
+                    <div id="forecast-insight"><strong>Insight:</strong> Shows which days are the cleanest</div>
+                </div>
+            </div>
+            <div class="forecast-grid" id="forecast-grid"></div>
+        </div>
+
+        <!-- Health Tab -->
+        <div id="health-tab" class="tab-content">
+            <h2 class="text-center mb-24">Health Tracking</h2>
+            <div class="health-log-form">
+                <h3 class="mb-16">Log Your Symptoms</h3>
+
+                <div class="form-group">
+                    <label class="form-label">Date</label>
+                    <input type="date" class="form-control" id="symptom-date">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Symptoms</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label"><input type="checkbox" value="cough"><span>Cough</span></label>
+                        <label class="checkbox-label"><input type="checkbox" value="shortness_of_breath"><span>Shortness
+                                of Breath</span></label>
+
+                        <label class="checkbox-label">
+                            <input type="checkbox" value="eye_irritation">
+                            <span>Eye Irritation</span>
+                        </label>
+
+                        <label class="checkbox-label"><input type="checkbox"
+                                value="headache"><span>Headache</span></label>
+                        <label class="checkbox-label"><input type="checkbox"
+                                value="fatigue"><span>Fatigue</span></label>
+                        <label class="checkbox-label"><input type="checkbox" value="throat_irritation"><span>Throat
+                                Irritation</span></label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Notes</label>
+                    <textarea class="form-control" id="symptom-notes" rows="3"></textarea>
+                </div>
+
+                <button class="btn btn-primary" onclick="addHealthEntry()">Add Entry</button>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Recent Health Entries</div>
+                <div class="health-entries" id="health-entries"></div>
+            </div>
+        </div>
+
+        <!-- News Tab -->
+        <div id="news-tab" class="tab-content">
+            <h2 class="text-center mb-24">Air Quality News & Insights</h2>
+            <div class="news-scroll" id="news-scroll"></div>
+        </div>
+
+        <!-- Past Data Tab -->
+        <div id="past-data-tab" class="tab-content">
+            <h2 class="text-center mb-24">📊 Past Sensor Data</h2>
+
+            <!-- Filter Bar -->
+            <div class="past-data-filters">
+                <div class="filter-group">
+                    <span class="filter-label">Period</span>
+                    <div class="filter-pills">
+                        <button class="filter-btn active" onclick="setPastMode('daily', this)">Last 10 Days</button>
+                        <button class="filter-btn" onclick="setPastMode('hourly', this)">Single Day</button>
+                    </div>
+                </div>
+                <!-- Date picker (shown only in Single Day mode) -->
+                <div class="filter-group" id="past-date-picker-group" style="display:none;">
+                    <span class="filter-label">Date</span>
+                    <input type="date" class="form-control" id="past-date-input" style="width:auto; padding: 6px 12px;"
+                        onchange="onPastDateChange()">
+                </div>
+                <div class="filter-group">
+                    <span class="filter-label">View</span>
+                    <div class="filter-pills">
+                        <button class="filter-btn active" onclick="setPastViewFilter('charts', this)">Charts</button>
+                        <button class="filter-btn" onclick="setPastViewFilter('table', this)">Table</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading / Empty State -->
+            <div id="past-data-empty" class="past-data-empty" style="display:none;">
+                <div style="font-size: 3em;">📭</div>
+                <p>No sensor readings found for this period.</p>
+                <p style="font-size:0.85em; opacity:0.6;">Data is stored once your ESP32 sends readings to the backend.
+                </p>
+            </div>
+
+            <!-- Charts View -->
+            <div id="past-data-charts-view">
+                <!-- PM / AQI Combined Chart -->
+                <div class="chart-section">
+                    <div class="chart-section-title">🌫️ Particulate Matter (PM1.0 / PM2.5 / PM10)</div>
+                    <div class="chart-section-subtitle">Combined AQI-related particle readings over time</div>
+                    <div class="chart-wrapper"><canvas id="chart-pm"></canvas></div>
+                </div>
+
+                <!-- Temperature -->
+                <div class="chart-section">
+                    <div class="chart-section-title">🌡️ Temperature (F°)</div>
+                    <div class="chart-wrapper"><canvas id="chart-temperature"></canvas></div>
+                </div>
+
+                <!-- Humidity -->
+                <div class="chart-section">
+                    <div class="chart-section-title">💧 Humidity (%)</div>
+                    <div class="chart-wrapper"><canvas id="chart-humidity"></canvas></div>
+                </div>
+
+                <!-- Pressure -->
+                <div class="chart-section">
+                    <div class="chart-section-title">🔵 Pressure (hPa)</div>
+                    <div class="chart-wrapper"><canvas id="chart-pressure"></canvas></div>
+                </div>
+
+                <!-- Gas Resistance -->
+                <div class="chart-section">
+                    <div class="chart-section-title">🧪 Gas Resistance (kΩ)</div>
+                    <div class="chart-section-subtitle">Higher values indicate cleaner air (fewer VOCs)</div>
+                    <div class="chart-wrapper"><canvas id="chart-gas"></canvas></div>
+                </div>
+
+                <!-- Altitude -->
+                <div class="chart-section">
+                    <div class="chart-section-title">⛰️ Altitude (m above sea level)</div>
+                    <div class="chart-wrapper"><canvas id="chart-altitude"></canvas></div>
+                </div>
+            </div>
+
+            <!-- Table View -->
+            <div id="past-data-table-view" style="display:none;">
+                <div class="table-wrapper">
+                    <table class="past-data-table" id="past-data-table">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Temp (°C)</th>
+                                <th>Humidity (%)</th>
+                                <th>Pressure (hPa)</th>
+                                <th>Gas (Ω)</th>
+                                <th>PM1.0</th>
+                                <th>PM2.5</th>
+                                <th>PM10</th>
+                                <th>Altitude (m)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="past-data-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div id="settings-tab" class="tab-content">
+            <h2 class="text-center mb-24">Settings</h2>
+
+            <div class="settings-section">
+                <div class="settings-title">Location</div>
+                <div class="card">
+                    <div class="form-group">
+                        <label class="form-label">Select Your City</label>
+                        <div class="form-group">
+                            <label class="form-label">Enter Location</label>
+                            <input id="locationSearchInput" type="text" class="form-control"
+                                placeholder="City or ZIP (ex: San Ramon, CA)">
+                            <button class="btn btn-primary mt-8" id="locationSearchBtn">
+                                Update Location
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <div class="settings-title">Preferences</div>
+                <div class="settings-item">
+                    <div>
+                        <div style="font-weight: var(--font-weight-medium);">Dark Mode</div>
+                        <div class="text-secondary">Toggle the interface theme</div>
+                    </div>
+                    <div class="toggle-switch" id="theme-toggle" onclick="toggleTheme()">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+                <div class="settings-item">
+                    <div>
+                        <div style="font-weight: var(--font-weight-medium);">Health Notifications</div>
+                        <div class="text-secondary">Receive alerts about air quality</div>
+                    </div>
+                    <div class="toggle-switch active" onclick="toggleSetting(this)">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <button class="btn btn-secondary btn-full" onclick="handleLogout()">Sign Out</button>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="nav-bar">
+            <div class="nav-item active" data-tab="home" onclick="switchTab('home')">
+                <div class="nav-icon">🏠</div>
+                <div>Home</div>
+            </div>
+            <div class="nav-item" data-tab="map" onclick="switchTab('map')">
+                <div class="nav-icon">🗺️</div>
+                <div>Map</div>
+            </div>
+            <div class="nav-item" data-tab="weekly" onclick="switchTab('weekly')">
+                <div class="nav-icon">📅</div>
+                <div>Weekly</div>
+            </div>
+            <div class="nav-item" data-tab="health" onclick="switchTab('health')">
+                <div class="nav-icon">💊</div>
+                <div>Health</div>
+            </div>
+            <div class="nav-item" data-tab="news" onclick="switchTab('news')">
+                <div class="nav-icon">📰</div>
+                <div>News</div>
+            </div>
+            <div class="nav-item" data-tab="settings" onclick="switchTab('settings')">
+                <div class="nav-icon">⚙️</div>
+                <div>Settings</div>
+            </div>
+            <div class="nav-item" data-tab="past-data" onclick="switchTab('past-data')">
+                <div class="nav-icon">📊</div>
+                <div>Past Data</div>
+            </div>
+        </nav>
+    </div>
+
+    <!-- News Modal -->
+    <div id="news-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeNewsModal()">&times;</span>
+            <div id="modal-header">
+                <div id="modal-icon" style="font-size: 48px; margin-bottom: 16px;"></div>
+                <h2 id="modal-title" style="margin-bottom: 8px;"></h2>
+                <div id="modal-meta" style="font-size: 0.9em; opacity: 0.7; margin-bottom: 24px;"></div>
+            </div>
+            <div id="modal-body" style="line-height: 1.6; opacity: 0.9;"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
