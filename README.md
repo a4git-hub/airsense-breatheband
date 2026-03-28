@@ -65,6 +65,7 @@ Public air quality data often comes from distant monitoring stations and does no
 - Cloud dashboard for live monitoring  
 - Predictive air quality modeling  
 - Expanded sensor suite  
+- Build 3D model and PCB board
 
 ## Team
 Aditya Singh
